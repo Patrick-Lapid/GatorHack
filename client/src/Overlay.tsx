@@ -47,19 +47,10 @@ const callBack = (buffer : ArrayBuffer, blob : Blob) => {
         }, 0); 
     
   };
-const audioRecorder = <AudioRecorder
-width="100px"
-height="100px"
-bgcolor="#98FF98"
-black={false}
-recorder={
-  new MicRecorder({
-    bitRate: 128,
-  })
-}
-callback={callBack}
-/>
+
 const Overlay = () => {
+
+    console.log("y u no load")
 
     const image1Url = chrome.runtime.getURL('images/mic_black.png');
 
@@ -87,15 +78,19 @@ const Overlay = () => {
             <form>
                 <label  className="sr-only">Your message</label>
                 <div className="flex items-center px-3 py-2 rounded-lg bg-gray-700">
-                    {audioRecorder}
-                    <button type="button" className="inline-flex border-none justify-center p-2 rounded-lg cursor-pointer  text-gray-400 hover:text-white hover:bg-gray-600">
-                        <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
-                            <path fill="currentColor" d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z"/>
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 1H2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z"/>
-                        </svg>
-                        <span className="sr-only">Upload image</span>
-                    </button>
+                    
+                    <AudioRecorder
+                        width="20px"
+                        height="20px"
+                        bgcolor="#138481"
+                        black={false}
+                        recorder={
+                        new MicRecorder({
+                            bitRate: 128,
+                        })
+                        }
+                        callback={callBack}
+                    />
                     <textarea id="chat" rows={1} className="block active:shadow-md mx-4 p-2.5 w-full text-sm rounded-lg border bg-gray-800 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="Your message..."></textarea>
                         <button type="submit" className="inline-flex border-none justify-center p-2 rounded-full cursor-pointer text-blue-500 hover:bg-gray-600">
                         <svg className="w-5 h-5 border-none rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
