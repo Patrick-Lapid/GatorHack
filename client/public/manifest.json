@@ -5,20 +5,23 @@
     "description": "A simple overlay extension",
     "permissions": ["activeTab"],
     "action": {
-        "default_popup": "js/index.html"
+        "default_popup": "index.html"
+    },
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self';"
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "css": ["./styles/contentscript.css"],
-            "js": ["./js/contentScript.bundle.js"]
-        }
+            "css": ["styles/contentscript.css"],
+            "js": ["contentScript.bundle.js"]
+        } 
     ],
     "web_accessible_resources": [
         {
             "matches": ["<all_urls>"],
             "resources": [
-                "./styles/contentscript.css, ./styles/Product-Sans-Regular.ttf"
+                "styles/contentscript.css" , "styles/Product-Sans-Regular.ttf", "images/mic_black.png"
             ]
         }
     ]

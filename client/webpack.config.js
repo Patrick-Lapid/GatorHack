@@ -33,19 +33,27 @@ module.exports = {
                 test: /\.js$|jsx/,
                 exclude: /node_modules/,
             },
+            {
+                test: /\.(png|jpe?g|gif)$/i,
+                use: [
+                  {
+                    loader: 'file-loader',
+                  },
+                ],
+              },
         ],
     },
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: './public/manifest.json', to: '../manifest.json' },
+                { from: './public/manifest.json', to: path.join(__dirname, 'dist') },
             ],
         }),
         new CopyPlugin({
             patterns: [
                 {
-                    from: './src/index.css',
-                    to: '../styles/contentscript.css',
+                    from: './src/contentscript.css',
+                    to: path.join(__dirname, 'dist', 'styles', 'contentscript.css'),
                     force: true,
                 },
             ],
@@ -54,7 +62,16 @@ module.exports = {
             patterns: [
                 {
                     from: './src/fonts/Product-Sans-Regular.ttf',
-                    to: '../styles/Product-Sans-Regular.ttf',
+                    to: path.join(__dirname, 'dist', 'styles', 'Product-Sans-Regular.ttf'),
+                    force: true,
+                },
+            ],
+        }),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: './public/mic_black.png',
+                    to: path.join(__dirname, 'dist', 'images', 'mic_black.png'),
                     force: true,
                 },
             ],
@@ -65,8 +82,9 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js'],
     },
     output: {
-        path: path.join(__dirname, 'dist/js'),
+        path: path.resolve(__dirname, 'dist'),
         filename: '[name].bundle.js',
+        clean: true,
     },
 };
 
