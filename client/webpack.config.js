@@ -4,7 +4,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     entry: {
-        index: './src/index.tsx',
+        // index: './src/index.tsx',
+        index: path.join(__dirname, 'src', 'index.tsx'),
+        contentScript: path.join(__dirname, 'src', 'overlay.js'),
     },
     mode: 'production',
     module: {
@@ -26,12 +28,35 @@ module.exports = {
                 test: /\.css$/i,
                 use: ['style-loader', 'css-loader'],
             },
+            {
+                loader: 'babel-loader',
+                test: /\.js$|jsx/,
+                exclude: /node_modules/,
+            },
         ],
     },
     plugins: [
         new CopyPlugin({
             patterns: [
                 { from: './public/manifest.json', to: '../manifest.json' },
+            ],
+        }),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: './src/index.css',
+                    to: '../styles/contentscript.css',
+                    force: true,
+                },
+            ],
+        }),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: './src/fonts/Product-Sans-Regular.ttf',
+                    to: '../styles/Product-Sans-Regular.ttf',
+                    force: true,
+                },
             ],
         }),
         ...getHtmlPlugins(['index']),
@@ -41,7 +66,7 @@ module.exports = {
     },
     output: {
         path: path.join(__dirname, 'dist/js'),
-        filename: '[name].js',
+        filename: '[name].bundle.js',
     },
 };
 

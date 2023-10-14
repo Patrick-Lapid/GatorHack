@@ -6,5 +6,20 @@
     "permissions": ["activeTab"],
     "action": {
         "default_popup": "js/index.html"
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "css": ["./styles/contentscript.css"],
+            "js": ["./js/contentScript.bundle.js"]
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "matches": ["<all_urls>"],
+            "resources": [
+                "./styles/contentscript.css, ./styles/Product-Sans-Regular.ttf"
+            ]
+        }
+    ]
 }

@@ -2,20 +2,17 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-@font-face {
+/* @font-face {
     font-family: googleFont;
     src: url(./fonts/Product-Sans-Regular.ttf);
+} */
+
+@font-face {
+    font-family: googleFont;
+    src: url('chrome-extension://__MSG_@@extension_id__/Product-Sans-Regular.ttf');
 }
 
-body {
-    margin: 0;
-    font-family: 'googleFont', 'Ubuntu';
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-container {
-    width: 15rem;
-    height: 15rem;
-    background-color: green;
+overlay {
+    font-family: 'googleFont';
+    border: 1px black solid;
 }
