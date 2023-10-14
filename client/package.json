@@ -21,7 +21,7 @@
     },
     "scripts": {
         "start": "react-scripts start",
-        "build": "webpack --config webpack.config.js",
+        "build": "webpack --config webpack.config.js && npx tailwindcss -i ./src/contentscript.css -o ./dist/styles/output.css --watch",
         "watch": "webpack -w --config webpack.config.js",
         "test": "react-scripts test",
         "eject": "react-scripts eject"
