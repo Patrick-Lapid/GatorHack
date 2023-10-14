@@ -1,10 +1,13 @@
 import React from 'react';
-import './index.css';
+import './contentscript.css';
 
 const Overlay = () => {
+
+    const image1Url = chrome.runtime.getURL('images/mic_black.png');
+
     return (
         <div
-            className="overlay"
+            className=""
             title="GPT overlay"
             // src="https://example.com" // Replace with the URL you want to display
             style={{
@@ -19,9 +22,12 @@ const Overlay = () => {
                 zIndex: 9999, // Adjust the z-index as needed
             }}
         >
-            <div className="bg-slate-300 rounded-md text-white overlay">
-                test
+            <div className="overlay">
+                <div>element 1</div>
+                <div>element 2</div>
+                <div>element 3</div>
             </div>
+            <img alt="img" src={image1Url} height={20} width={20}></img>
         </div>
     );
 };

@@ -9,10 +9,12 @@
 
 @font-face {
     font-family: googleFont;
-    src: url('chrome-extension://__MSG_@@extension_id__/Product-Sans-Regular.ttf');
+    src: url('chrome-extension://ebhnpaiclmjobjpcacgmcdifadibdlmn/styles/Product-Sans-Regular.ttf');
 }
 
-overlay {
+.overlay {
     font-family: 'googleFont';
+    display: flex;
+    flex-direction: row;
     border: 1px black solid;
 }
