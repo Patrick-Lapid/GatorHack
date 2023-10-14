@@ -13,7 +13,7 @@
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "css": ["styles/contentscript.css"],
+            "css": ["styles/output.css"],
             "js": ["contentScript.bundle.js"]
         } 
     ],
@@ -21,7 +21,7 @@
         {
             "matches": ["<all_urls>"],
             "resources": [
-                "styles/contentscript.css" , "styles/Product-Sans-Regular.ttf", "images/mic_black.png"
+                "styles/output.css" , "styles/Product-Sans-Regular.ttf", "images/mic_black.png"
             ]
         }
     ]
