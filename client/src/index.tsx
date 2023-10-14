@@ -7,6 +7,11 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
+const extensionRoot = document.createElement('div');
+extensionRoot.id = 'extension-root';
+document.body.appendChild(extensionRoot);
+
+
 root.render(
   <React.StrictMode>
     <App />
