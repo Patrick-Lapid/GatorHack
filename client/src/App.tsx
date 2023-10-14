@@ -25,7 +25,7 @@ export default App;
 
 /*
 import React from 'react';
-import AudioRecorder from './AudioRecorder';
+import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
 
 const callBack = (buffer : ArrayBuffer, blob : Blob) => {
