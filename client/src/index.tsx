@@ -3,17 +3,12 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = document.createElement('div');
+root.className = 'container';
+document.body.appendChild(root);
 
-const extensionRoot = document.createElement('div');
-extensionRoot.id = 'extension-root';
-document.body.appendChild(extensionRoot);
-
-
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>
 );

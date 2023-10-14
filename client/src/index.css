@@ -1,17 +1,21 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities"; 
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 @font-face {
-  font-family: googleFont;
-  src: url(./fonts/Product-Sans-Regular.ttf);
+    font-family: googleFont;
+    src: url(./fonts/Product-Sans-Regular.ttf);
 }
 
 body {
-  margin: 0;
-  font-family: 'googleFont', 'Ubuntu';
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: 'googleFont', 'Ubuntu';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-
+container {
+    width: 15rem;
+    height: 15rem;
+    background-color: green;
+}
