@@ -2,11 +2,6 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* @font-face {
-    font-family: googleFont;
-    src: url(./fonts/Product-Sans-Regular.ttf);
-} */
-
 @font-face {
     font-family: googleFont;
     src: url('chrome-extension://ebhnpaiclmjobjpcacgmcdifadibdlmn/styles/Product-Sans-Regular.ttf');
