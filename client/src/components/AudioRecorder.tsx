@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 
+
+const whiteImage1Url = chrome.runtime.getURL('images/mic_white.png');
+const blackImage1Url = chrome.runtime.getURL('images/mic_black.png');
+
 interface AudioRecorderProps {
   width: string;
   height: string;
@@ -70,7 +74,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     <div style={style} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>
       <img
         style={imageStyle}
-        src={black ? 'mic_black.png' : 'mic_white.png'}
+        src={black ? blackImage1Url : whiteImage1Url}
         alt="microphone"
       />
       <div style={squareStyle} />
