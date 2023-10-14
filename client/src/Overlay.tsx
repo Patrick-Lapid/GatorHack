@@ -3,6 +3,23 @@ import './contentscript.css';
 import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
 
+const ws = new WebSocket('ws://localhost:8765');
+
+    // When the connection is open, send the text
+    ws.onopen = () => {
+        ws.send("AAAAA");
+    };
+
+    // Log any messages received from the server
+    ws.onmessage = (message) => {
+        console.log(`Received: ${message.data}`);
+    };
+
+    // Log any errors
+    ws.onerror = (error) => {
+        console.log(`WebSocket error: ${error}`);
+    };
+
 const callBack = (buffer : ArrayBuffer, blob : Blob) => {
     // do what ever you want with buffer and blob
     // Example: Create a mp3 file and play
