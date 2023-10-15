@@ -5,7 +5,7 @@ import useMeasure from "react-use-measure";
 import { SquareMinus } from 'tabler-icons-react';
 import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
-import { filterPhoneSection } from './scripts/filter';
+import { filterPhoneSection, filterTabletSection } from './scripts/filter';
 
 const registry = new Map<string,(arg0: any) => void>();
 
@@ -49,15 +49,6 @@ const callBack = (buffer : ArrayBuffer, blob : Blob) => {
         data: buffer
     }
     ws.send(JSON.stringify(msg))
-    //no clue why this won't compile without "buffer as any"
-    /*const file = new File(buffer as any, 'me-at-thevoice.mp3', {
-      type: blob.type,
-      lastModified: Date.now(),
-    });*/
-  
-    //const player = new Audio(URL.createObjectURL(file));
-    //player.play();
-    
   };
 
 
@@ -97,9 +88,14 @@ const Overlay = () => {
         setResponse(str)}
     )
 
-    registerType("filter", async (arr: any) => {
+    registerType("filterPhone", async (arr: any) => {
         const filterParams = ["Google", "Nokia", "$30-$40"]
         filterPhoneSection(filterParams);
+    })
+
+    registerType("filterTablet", async (arr: any) => {
+        const filterParams = ["Laptops", "iPadGeneration", "New"]
+        filterTabletSection(filterParams);
     })
 
     return (        
