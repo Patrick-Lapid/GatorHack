@@ -84,12 +84,12 @@ test_nav = {
 async def recieve_ChatMessage(state,data):
     print("Revieved Chat Message")
     #await our_Father(state)
-    x = test_nav #main_entry_function(data, state['url'])
+    x = main_entry_function(data, state['url'])
 
     #deprecated
     #print(x)
     #state['response'] = x[0]
-    #websocket = state["ws"]
+    websocket = state["ws"]
 
     #x will look like such:
     #{

@@ -136,22 +136,25 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             return;
         }
 
-        setResponse("");
+        //setResponse("");
 
         // call the first one + update summary text and links
         if (isSummaryResponse(event)) {
             // `event` has type `summaryResponse`.
             setLinks(event.links);
+            //str
+            setExpanded(true)
+            //setResponse(str)
 
         } else {
             // `event` has type `actionResponse`.
             // update screen + perform action
-            if(event?.act === "filterPhone") {
+            if(event?.act === "get_filters") {
                 
                 setResponse("Filtering phones...");
                 filterPhoneSection(event.act_list);
 
-            } else if (event?.act === "filterTablet"){
+            } else if (event?.act === "get_filters"){
 
                 setResponse("Filtering tablets by: ")
                 filterTabletSection(event.act_list);

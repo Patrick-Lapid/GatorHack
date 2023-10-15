@@ -4,12 +4,8 @@ import pandas as pd
 import numpy as np
 import pinecone
 import json
-import os
-from dotenv import load_dotenv
 
-load_dotenv()  
-
-openai.api_key = os.environ.get("API_KEY")
+openai.api_key = "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"
 summary_df = pd.read_csv("audio/updated_all_data.csv")
 
 actions = [
@@ -279,7 +275,7 @@ def summarize(query):
 def intent_detection(query):
     '''Get intent from given query'''
 
-    query = f'''Given the user query "#QUERY#", identify the intent. 
+    query = f'''Given the user query "#QUERY#", identify the intent and provide a response in the format: {{"intent": "INTENT", "action": "ACTION"}}. 
 The possible #INTENT# values are:
 - Information: Where the user is seeking an explanation, summary, or information.
 - Action: Where the user intends to perform an action, like filtering, sorting, navigating etc.
@@ -289,13 +285,9 @@ If the #INTENT# is "Action", further describe the specific intent in #ACTION#. S
 
 For instance, the query "Show me all iPhones in red color" would have a response as {{"intent": "Action", "action": "Show me phones"}}.
 
-#Response Schema#: {{"intent": "INTENT", "action": "ACTION"}}
-
 #QUERY#: "{query}"'''
     
-    print(query)
     intent = openai.Completion.create(model="gpt-3.5-turbo-instruct", prompt=query, temperature=0.1)
-    print(intent)
     return intent.choices[0].text[2:]
 
 def get_function_call(query_embedding, h_state):
@@ -357,6 +349,21 @@ def get_action(query, query_intent_action, local_page):
             return None
 
 
+# def main_entry_function(query, local_page):
+#     '''Main usable function for singular query'''
+#     #Get intent
+#     query_intent = json.loads(intent_detection(query))
+#     #Conditional Statament
+#     if query_intent["intent"] == "Information":
+#         info = summarize(query)
+#         return info
+#     elif query_intent["intent"] == "Action":
+#         query_intent_action = query_intent['action']
+#         action = get_action(query, query_intent_action, local_page)
+#         return action
+#     else:
+#         pass
+
 def main_entry_function(query, local_page):
     '''Main usable function for singular query'''
     #Get intent
@@ -365,16 +372,16 @@ def main_entry_function(query, local_page):
     if query_intent["intent"] == "Information":
         info = summarize(query)
         result_json =  {
-            "type": "summaryResponse",
+            "type": "summary",
             "message": info[0],
             "link": info[1],
             "action": None,
         }
-        json_string = json.dumps(result_json)
-        return json_string
+        return result_json
     elif query_intent["intent"] == "Action":
         query_intent_action = query_intent['action']
         action = get_action(query, query_intent_action, local_page)
+        print(action)
         if action[0] != local_page:
             result_json = {
                 "type": "navigation",
@@ -385,18 +392,16 @@ def main_entry_function(query, local_page):
                     "act_list": action[2]
                 }
             }
-            json_string = json.dumps(result_json)
-            return json_string
+            return result_json
         else:
             result_json = {
-                "type": "actionResponse",
+                "type": "action",
                 "action": {
                     "act": action[1],
                     "act_list": action[2]
                 }
             }
-            json_string = json.dumps(result_json)
-            return json_string
+            return result_json
     else:
         return None
 
