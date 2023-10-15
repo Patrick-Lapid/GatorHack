@@ -30,51 +30,51 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
 
     // Log any messages received from the server
     ws.onmessage = (message) => {
-        // console.log(`Received: ${message.data}`);
-        const data = JSON.parse(message.data)
+            // console.log(`Received: ${message.data}`);
+            const data = JSON.parse(message.data)
+            
+        const lambda = registry.get(data.type)
+        //if lambda is not undefined, then execute it using data.data
+        if (lambda !== undefined) {
+            lambda(data.data)
+        }
+    };
+
+    // Log any errors
+    ws.onerror = (error) => {
+        console.log(`WebSocket error: ${error}`);
+    };
+
+
+    const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
+        registry.set(s,callBack)
+    }
+
+    const callBack = (buffer : ArrayBuffer, blob : Blob) => {
         
-    const lambda = registry.get(data.type)
-    //if lambda is not undefined, then execute it using data.data
-    if (lambda !== undefined) {
-        lambda(data.data)
-    }
-};
-
-// Log any errors
-ws.onerror = (error) => {
-    console.log(`WebSocket error: ${error}`);
-};
+        const msg = {
+            id: id,
+            type: "audioMessage",
+            data: buffer
+        }
+        ws.send(JSON.stringify(msg))
+    };
 
 
-const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
-    registry.set(s,callBack)
-}
-
-const callBack = (buffer : ArrayBuffer, blob : Blob) => {
-    
-    const msg = {
-        id: id,
-        type: "audioMessage",
-        data: buffer
-    }
-    ws.send(JSON.stringify(msg))
-  };
-
-
-const characterAnimation = {
-    hidden: {
-      opacity: 0,
-      y: `0.25em`,
-    },
-    visible: {
-      opacity: 1,
-      y: `0em`,
-      transition: {
-        duration: 1,
-        ease: [0.2, 0.65, 0.3, 0.9],
-      },
-    },
-  };
+    const characterAnimation = {
+        hidden: {
+        opacity: 0,
+        y: `0.25em`,
+        },
+        visible: {
+        opacity: 1,
+        y: `0em`,
+        transition: {
+            duration: 1,
+            ease: [0.2, 0.65, 0.3, 0.9],
+        },
+        },
+    };
 
 
 
@@ -111,7 +111,7 @@ const characterAnimation = {
     //3 actions in the array
     registerType("recieveActions", (actions : ActionButtonData[] ) => {
         console.log(actions)
-        
+    })
     registerType("filterPhone", async (arr: any) => {
         const filterParams = ["Google", "Nokia", "$30-$40"]
         filterPhoneSection(filterParams);
