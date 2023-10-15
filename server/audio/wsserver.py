@@ -40,11 +40,12 @@ text = "Our Father, which art in heaven, Hallowed be thy Name. Thy Kingdom come.
 async def our_Father(state):
     print("Our Father")
     for i in range(0,len(text)):
-        time.sleep(0.1)
+        #time.sleep(0.1)
         state["response"] = text[0:i]
         
         websocket = state["ws"]
         try:
+            
             await websocket.send(f"""{{"type": "streamChars","data": "{state["response"]}"}}""")
         except Exception as e:
             pass
