@@ -61,25 +61,26 @@ async def recieve_ChatMessage(state,data):
     await our_Father(state)
 register_callback("chatMessage", recieve_ChatMessage )
 
-async def get_filters(state,data):
-    print("Recieved filter parameters")
-    exampleData = ["filter", ["BRAND"], ["OS"], ["SPECIAL_OFFERS"], ["PRICE"], ["CONDITION"], ["AVAILABILITY"], ["COLOR"]] #hardcode?
-    return exampleData
+#Needed? 
+# async def get_filters(state,data):
+#     print("Recieved filter parameters")
+#     exampleData = []
+#     return exampleData
 
-async def get_filters_tablet(state,data):
-    print("Recieved tablet filter parameters")
-    return ["filter", data]
+# async def get_filters_tablet(state,data):
+#     print("Recieved tablet filter parameters")
+#     return ["filter", data]
 
-async def get_sort_by(state,data):
-    print("Recieved Sort Preference")
-    print(data)
-    return ["sort", data]
+# async def get_sort_by(state,data):
+#     print("Recieved Sort Preference")
+#     print(data)
+#     return ["sort", data]
 
 async def scroll(state, data):
     print("Received scroll command")
     print(data)
-    state["response"] = ["scroll", data]
-    await state["ws"].send(f"""{{"type": "streamChars","data": "{state["response"]}"}}""")
+    state["response"] = data
+    await state["ws"].send(f"""{{"type": "scroll","data": "{state["response"]}"}}""")
 
 
 async def echo(websocket):
