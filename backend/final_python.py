@@ -11,8 +11,7 @@ load_dotenv()
 
 openai.api_key = os.environ.get("API_KEY")
 
-
-summary_df = pd.read_csv("../scraping/updated_all_data.csv")
+summary_df = pd.read_csv("summary_embeddings.csv")
 
 actions = [
     [

@@ -4,8 +4,12 @@ import pandas as pd
 import numpy as np
 import pinecone
 import json
+import os
+from dotenv import load_dotenv
 
-openai.api_key = "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"
+load_dotenv()  
+
+openai.api_key = os.environ.get("API_KEY")
 summary_df = pd.read_csv("audio/updated_all_data.csv")
 
 actions = [
@@ -326,7 +330,14 @@ def get_action(query, query_intent_action, local_page):
         response = openai.ChatCompletion.create(model="gpt-3.5-turbo",  temperature=0.1, functions=[action_df.loc[action_df['id'] == function_call_id]['openai_func_call'].values[0]], messages=[{"role": "user", "content": query_updated}])
         if "function_call" not in response.choices[0].message:
             return None
-        return response
+        func_call_output = response.choices[0].message.function_call
+        func_call_name = func_call_output.name
+        func_call_args_raw = json.loads(func_call_output.arguments)
+        func_call_args = []
+        for key in func_call_args_raw:
+            for value in func_call_args_raw[key]:
+                func_call_args.append(value)
+        return (local_page, func_call_name, func_call_args)
     #Global Action if 1. local action not hit 2. local action not available
     else:
         query_intent_action_embedding = create_embedding(query_intent_action)
@@ -353,13 +364,41 @@ def main_entry_function(query, local_page):
     #Conditional Statament
     if query_intent["intent"] == "Information":
         info = summarize(query)
-        return info
+        result_json =  {
+            "type": "summaryResponse",
+            "message": info[0],
+            "link": info[1],
+            "action": None,
+        }
+        json_string = json.dumps(result_json)
+        return json_string
     elif query_intent["intent"] == "Action":
         query_intent_action = query_intent['action']
         action = get_action(query, query_intent_action, local_page)
-        return action
+        if action[0] != local_page:
+            result_json = {
+                "type": "navigation",
+                "message": "I think this link will help. Would you like to navigate there?",
+                "link": action[0],
+                "action": {
+                    "act": action[1],
+                    "act_list": action[2]
+                }
+            }
+            json_string = json.dumps(result_json)
+            return json_string
+        else:
+            result_json = {
+                "type": "actionResponse",
+                "action": {
+                    "act": action[1],
+                    "act_list": action[2]
+                }
+            }
+            json_string = json.dumps(result_json)
+            return json_string
     else:
-        pass
+        return None
 
 '''
 VECTOR DB CREATION FUNCTIONS
