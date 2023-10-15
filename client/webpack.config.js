@@ -74,6 +74,11 @@ module.exports = {
                     to: path.join(__dirname, 'dist', 'images', 'mic_black.png'),
                     force: true,
                 },
+                {
+                    from: './public/mic_white.png',
+                    to: path.join(__dirname, 'dist', 'images', 'mic_white.png'),
+                    force: true,
+                },
             ],
         }),
         ...getHtmlPlugins(['index']),
