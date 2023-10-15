@@ -4,7 +4,6 @@ import time
 import json
 import random
 from final_python import main_entry_function
-
 def parse_json(json_string):
     try:
         python_map = json.loads(json_string)
@@ -41,11 +40,12 @@ text = "Our Father, which art in heaven, Hallowed be thy Name. Thy Kingdom come.
 async def our_Father(state):
     print("Our Father")
     for i in range(0,len(text)):
-        time.sleep(0.1)
+        #time.sleep(0.1)
         state["response"] = text[0:i]
         
         websocket = state["ws"]
         try:
+            
             await websocket.send(f"""{{"type": "streamChars","data": "{state["response"]}"}}""")
         except Exception as e:
             pass
@@ -57,15 +57,63 @@ async def recieve_AudioMessage(state,data):
     await our_Father(state)
 register_callback("audioMessage", our_Father )
 
+test_summary = {
+    "type" : "summary",
+    "message": "Ooga Booga",
+    "link": ["google.com","bing.com"]
+}
+
+test_action = {
+    "type" : "action",
+    "action" : {
+        "act" : "scroll",
+        "act_list" : "down"
+    }
+}
+
 async def recieve_ChatMessage(state,data):
     print("Revieved Chat Message")
     #await our_Father(state)
     x = main_entry_function(data, state['url'])
-    print(x)
-    state['response'] = x[0]
-    websocket = state["ws"]
+
+    #deprecated
+    #print(x)
+    #state['response'] = x[0]
+    #websocket = state["ws"]
+
+    #x will look like such:
+    #{
+    #type: "",
+    #message: "",
+    #link: [],
+    #action: {
+    #        act: "",
+    #        act_list: []
+    #    }
+    #}
+
+    
+
+    
     try:
-        await websocket.send(f"""{{"type": "streamChars","data": "{state["response"]}"}}""")
+        if x['type'] == 'summary':
+            #state["response"] = 
+            await websocket.send(f"""{{"type": "streamChars","data": "{ x['message'] }"}}""")
+            record = {
+                "type": "summaryResponse",
+                "data": {
+                    "summary": x['message'],
+                    "links": x['link']
+                },
+            }
+            await websocket.send(json.dumps(record))
+        if x['type'] == 'action':
+            record = {
+                "type": "actionResponse",
+                "data": x['action']
+            }
+            await websocket.send(json.dumps(record))
+
     except Exception as e:
         pass
         print(f"Error sending message: {e}")
