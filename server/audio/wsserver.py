@@ -71,10 +71,20 @@ test_action = {
     }
 }
 
+test_nav = {
+    "type" : "navigation",
+    "message" : "Ooga Booga",
+    "link" : ["musescore.com"], 
+    "action" : {
+        "act" : "scroll",
+        "act_list" : "down"
+    }
+}
+
 async def recieve_ChatMessage(state,data):
     print("Revieved Chat Message")
     #await our_Father(state)
-    x = main_entry_function(data, state['url'])
+    x = test_nav #main_entry_function(data, state['url'])
 
     #deprecated
     #print(x)
@@ -113,6 +123,21 @@ async def recieve_ChatMessage(state,data):
                 "data": x['action']
             }
             await websocket.send(json.dumps(record))
+        if x['type'] == 'navigation':
+            link = x['link'][0]
+            record = {
+                "type": "summaryResponse",
+                "data": {
+                    "summary": x['message'],
+                    "links": x['link']
+                },
+            }
+            record2 = record = {
+                "type": "actionResponse",
+                "data": x['action']
+            }
+            await websocket.send(json.dumps(record))
+            followups[state["ip"]+":"+link] = lambda ws: ws.send(json.dumps(record2) )
 
     except Exception as e:
         pass
