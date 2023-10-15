@@ -5,7 +5,7 @@ import numpy as np
 import pinecone
 import json
 
-openai.api_key = "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"
+openai.api_key = "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"
 summary_df = pd.read_csv("audio/updated_all_data.csv")
 
 actions = [
