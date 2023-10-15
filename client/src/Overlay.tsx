@@ -21,10 +21,9 @@ const ws = new WebSocket('ws://localhost:8765');
     };
 
 const callBack = (buffer : ArrayBuffer, blob : Blob) => {
-    // do what ever you want with buffer and blob
-    // Example: Create a mp3 file and play
     
-  
+    
+    ws.send(buffer)
     //no clue why this won't compile without "buffer as any"
     const file = new File(buffer as any, 'me-at-thevoice.mp3', {
       type: blob.type,
@@ -33,18 +32,6 @@ const callBack = (buffer : ArrayBuffer, blob : Blob) => {
   
     //const player = new Audio(URL.createObjectURL(file));
     //player.play();
-    
-    const filename = "aaaa.mp3"
-    var a = document.createElement("a"),
-            url = URL.createObjectURL(file);
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function() {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);  
-        }, 0); 
     
   };
 
