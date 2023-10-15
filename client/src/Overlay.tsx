@@ -29,7 +29,8 @@ interface AudioRecorderProps {
 }
 
 const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
-
+    const currentUrl = window.location.href;
+    
     const chatRef = React.useRef<HTMLInputElement>(null);
     const handleMessageSend = () => {
         const message = chatRef.current?.value;
@@ -49,7 +50,8 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
     // When the connection is open, send the text
     ws.onopen = () => {
         //ws.send("AAAAA");
-        ws.send(JSON.stringify({type: "register",id: id}))
+        ws.send(JSON.stringify({type: "register",data:{url: currentUrl}}))
+        
     };
 
     // Log any messages received from the server
