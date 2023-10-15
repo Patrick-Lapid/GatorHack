@@ -71,7 +71,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
   };
 
   return (
-    <div style={style} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>
+    <div style={style} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} className='cursor-pointer'>
       <img
         style={imageStyle}
         src={black ? blackImage1Url : whiteImage1Url}
