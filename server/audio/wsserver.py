@@ -60,16 +60,15 @@ register_callback("audioMessage", our_Father )
 async def recieve_ChatMessage(state,data):
     print("Revieved Chat Message")
     #await our_Father(state)
-    x = main_entry_function(data, state["url"] )
+    x = main_entry_function(data, state['url'])
     print(x)
+    state['response'] = x[0]
     websocket = state["ws"]
-    state["response"] = x[0]
-    try:     
+    try:
         await websocket.send(f"""{{"type": "streamChars","data": "{state["response"]}"}}""")
     except Exception as e:
-            pass
-
-
+        pass
+        print(f"Error sending message: {e}")
 register_callback("chatMessage", recieve_ChatMessage )
 
 #Needed? 

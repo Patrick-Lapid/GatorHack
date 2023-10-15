@@ -275,38 +275,23 @@ def summarize(query):
 def intent_detection(query):
     '''Get intent from given query'''
 
-#     query = f'''Given the user query "#QUERY#", identify the intent and provide a response in the format:
+    query = f'''Given the user query "#QUERY#", identify the intent. 
+The possible #INTENT# values are:
+- Information: Where the user is seeking an explanation, summary, or information.
+- Action: Where the user intends to perform an action, like filtering, sorting, navigating etc.
+- None: If there's no discernible intent.
 
-#     {{"intent": "INTENT", "action": "ACTION"}}
+If the #INTENT# is "Action", further describe the specific intent in #ACTION#. Some examples of navigation might be: "navigate to xyz.com", "show all phones", "scroll up" etc.
 
-# The possible #INTENT# values are:
-# - Information: Where the user is seeking an explanation, summary, or information.
-# - Action: Where the user intends to perform an action, like filtering, sorting, navigating etc.
-# - None: If there's no discernible intent.
+For instance, the query "Show me all iPhones in red color" would have a response as {{"intent": "Action", "action": "Show me phones"}}.
 
-# If the #INTENT# is "Action", further describe the specific intent in #ACTION#. Some examples of navigation might be: "navigate to xyz.com", "show all phones", "scroll up" etc.
+#Response Schema#: {{"intent": "INTENT", "action": "ACTION"}}
 
-# For instance, the query "Show me all iPhones in red color" would have a response as {{"intent": "Action", "action": "Show me phones"}}.
-
-# #QUERY#: "{query}"'''
-    query=f'''program:
-- Identify the intent of the QUERY. The possible INTENT values are:
-    - Information: Where the user is seeking an explanation, summary, or information.
-    - Action: Where the user intends to perform an action, like filtering, sorting, navigating etc.
-    - None: If there's no discernible intent.
-- Examples
-    - "Show me all iPhones in red color" would have a response as {"intent": "Action", "action": "Show me phones"}
-    - "What is Verizon?" would have a response as {"intent": "Information", "action": "NONE"}
-
-QUERY: 
-{query}
-
-Response Schema:
-{"intent": "INTENT", "action": "ACTION"}
-'''
+#QUERY#: "{query}"'''
+    
     print(query)
     intent = openai.Completion.create(model="gpt-3.5-turbo-instruct", prompt=query, temperature=0.1)
-    print(intent)###FIXME### Create log instead of printing
+    print(intent)
     return intent.choices[0].text[2:]
 
 def get_function_call(query_embedding, h_state):

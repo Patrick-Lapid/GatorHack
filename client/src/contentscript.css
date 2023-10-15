@@ -13,3 +13,65 @@
     flex-direction: row;
     border: 1px black solid;
 }
+.kinetic {
+    position: relative;
+    width : 35px;
+    height : 35px;
+  }
+  
+  .kinetic::before,
+  .kinetic::after {
+    content: "";
+    position: absolute;
+    top: -23;
+    left: -23;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-bottom-color: #4e80ee;
+    animation: rotateA 2s ease-in-out infinite 0.5s,
+      color-change 2s ease-in-out infinite 1s;
+  }
+  
+  .kinetic::before {
+    animation: rotateB 2s ease-in-out infinite,
+      color-change 2s ease-in-out infinite;
+  }
+  
+  @keyframes rotateA {
+    0%,
+    25% {
+      transform: rotate(0deg);
+    }
+  
+    50%,
+    75% {
+      transform: rotate(180deg);
+    }
+  
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes rotateB {
+    0%,
+    25% {
+      transform: rotate(90deg);
+    }
+  
+    50%,
+    75% {
+      transform: rotate(270deg);
+    }
+  
+    100% {
+      transform: rotate(450deg);
+    }
+  }
+  
+  @keyframes color-change {
+    75% {
+      border-bottom-color: #4468ad;
+    }
+  }
