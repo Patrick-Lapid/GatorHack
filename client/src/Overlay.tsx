@@ -58,7 +58,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
     };
 
     const [expanded, setExpanded] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [event, setEvent] = useState<summaryResponse | actionResponse | null>(null);
     const [links, setLinks] = useState<string[]>([]);
     const [ref, { height }] = useMeasure();
