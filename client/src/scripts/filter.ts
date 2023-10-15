@@ -1,3 +1,4 @@
+// https://www.verizon.com/shop/online/5g-cell-phones/
 export const filterPhoneSection = async (filterParams: any) => {
 
     console.log("filtering...");
@@ -39,6 +40,7 @@ export const filterPhoneSection = async (filterParams: any) => {
 
 }
 
+// https://www.verizon.com/tablets/
 export const filterTabletSection = async (filterParams: any) => {
     console.log("filtering...");
     const brandDropdown : HTMLElement | null = document.querySelector('#accordian-content > div > div > div:nth-child(1) > div.StyledAccordionItem-VDS__sc-h2bqgc-1.mCOTK > div.WrapperDiv-VDS__sc-19osi3m-3.jFGcii > button') as HTMLElement;
