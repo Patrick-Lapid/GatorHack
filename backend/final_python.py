@@ -5,8 +5,8 @@ import numpy as np
 import pinecone
 import json
 
-openai.api_key = "ENTER API KEY HERE"
-summary_df = pd.read_csv("summary_embeddings.csv")
+openai.api_key = "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"
+summary_df = pd.read_csv("../scraping/updated_all_data.csv")
 
 actions = [
     [
