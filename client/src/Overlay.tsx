@@ -5,72 +5,80 @@ import useMeasure from "react-use-measure";
 import { SquareMinus } from 'tabler-icons-react';
 import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
+import { type } from 'os';
 import { filterPhoneSection, filterTabletSection } from './scripts/filter';
 import { sortBy } from './scripts/sort';
 
 const registry = new Map<string,(arg0: any) => void>();
 
+//deprecated, but kept to be flexible
 const id = Math.random()
 
-const ws = new WebSocket('ws://localhost:8765');
 
-// When the connection is open, send the text
-ws.onopen = () => {
-    //ws.send("AAAAA");
-    ws.send(JSON.stringify({type: "register",id: id}))
-};
+interface AudioRecorderProps {
+    webSocket: WebSocket;
+}
+
+const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
+
+    const ws = webSocket
+
+    // When the connection is open, send the text
+    ws.onopen = () => {
+        //ws.send("AAAAA");
+        ws.send(JSON.stringify({type: "register",id: id}))
+    };
 
     // Log any messages received from the server
     ws.onmessage = (message) => {
-        // console.log(`Received: ${message.data}`);
-        const data = JSON.parse(message.data)
+            // console.log(`Received: ${message.data}`);
+            const data = JSON.parse(message.data)
+            
+        const lambda = registry.get(data.type)
+        //if lambda is not undefined, then execute it using data.data
+        if (lambda !== undefined) {
+            lambda(data.data)
+        }
+    };
+
+    // Log any errors
+    ws.onerror = (error) => {
+        console.log(`WebSocket error: ${error}`);
+    };
+
+
+    const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
+        registry.set(s,callBack)
+    }
+
+    const callBack = (buffer : ArrayBuffer, blob : Blob) => {
         
-    const lambda = registry.get(data.type)
-    //if lambda is not undefined, then execute it using data.data
-    if (lambda !== undefined) {
-        lambda(data.data)
-    }
-};
-
-// Log any errors
-ws.onerror = (error) => {
-    console.log(`WebSocket error: ${error}`);
-};
+        const msg = {
+            id: id,
+            type: "audioMessage",
+            data: buffer
+        }
+        ws.send(JSON.stringify(msg))
+    };
 
 
-const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
-    registry.set(s,callBack)
-}
-
-const callBack = (buffer : ArrayBuffer, blob : Blob) => {
-    
-    const msg = {
-        id: id,
-        type: "audioMessage",
-        data: buffer
-    }
-    ws.send(JSON.stringify(msg))
-  };
-
-
-const characterAnimation = {
-    hidden: {
-      opacity: 0,
-      y: `0.25em`,
-    },
-    visible: {
-      opacity: 1,
-      y: `0em`,
-      transition: {
-        duration: 1,
-        ease: [0.2, 0.65, 0.3, 0.9],
-      },
-    },
-  };
+    const characterAnimation = {
+        hidden: {
+        opacity: 0,
+        y: `0.25em`,
+        },
+        visible: {
+        opacity: 1,
+        y: `0em`,
+        transition: {
+            duration: 1,
+            ease: [0.2, 0.65, 0.3, 0.9],
+        },
+        },
+    };
 
 
 
-const Overlay = () => {
     const chatRef = React.useRef<HTMLInputElement>(null);
     const handleMessageSend = () => {
         const message = chatRef.current?.value;
@@ -83,12 +91,28 @@ const Overlay = () => {
     const [ref, { height }] = useMeasure();
     const [response, setResponse] = useState("");
 
+
     registerType("streamChars", (s: any) => {
         const str = s as string
         setExpanded(true)
         setResponse(str)}
     )
 
+    type ActionButtonData = {
+        display: {
+            type: string; 
+            data: any;
+        };
+        action: {
+            type: string;
+            data: any;
+        }
+    };
+
+    //3 actions in the array
+    registerType("recieveActions", (actions : ActionButtonData[] ) => {
+        console.log(actions)
+    })
     registerType("filterPhone", async (arr: any) => {
         const filterParams = ["Google", "Nokia", "$30-$40"]
         filterPhoneSection(filterParams);
@@ -132,12 +156,9 @@ const Overlay = () => {
                 {expanded && <p className=' text-white container mx-auto'>
                 {response}
                 </p>}
+                
             </div>
-
-            <div>
-                some text
-            </div>
-
+            
             {/* chatbot interface */}
             <form style={{
                 position: 'fixed',
@@ -145,6 +166,15 @@ const Overlay = () => {
                 bottom: 0,
                 left: 0,
             }}>
+                <div className="container" style={expanded ? {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                } : {display:'none'}}>
+                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 1</div>
+                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 2</div>
+                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 3</div>
+                </div>
                 <label className="sr-only">Your message</label>
                 <div className="flex items-center px-3 py-2 rounded-lg bg-gray-700">
                     
