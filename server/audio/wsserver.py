@@ -3,7 +3,7 @@ from websockets.server import serve
 import time
 import json
 import random
-
+from final_python import main_entry_function
 def parse_json(json_string):
     try:
         python_map = json.loads(json_string)
@@ -59,7 +59,17 @@ register_callback("audioMessage", our_Father )
 
 async def recieve_ChatMessage(state,data):
     print("Revieved Chat Message")
-    await our_Father(state)
+    #await our_Father(state)
+    x = main_entry_function(data, state["url"] )
+    print(x)
+    websocket = state["ws"]
+    state["response"] = x[0]
+    try:     
+        await websocket.send(f"""{{"type": "streamChars","data": "{state["response"]}"}}""")
+    except Exception as e:
+            pass
+
+
 register_callback("chatMessage", recieve_ChatMessage )
 
 #Needed? 
