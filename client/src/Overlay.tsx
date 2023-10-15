@@ -157,6 +157,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
                 </p>}
                 
             </div>
+            
             {/* chatbot interface */}
             <form style={{
                 position: 'fixed',
@@ -164,6 +165,15 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
                 bottom: 0,
                 left: 0,
             }}>
+                <div className="container" style={expanded ? {
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                } : {display:'none'}}>
+                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 1</div>
+                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 2</div>
+                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 3</div>
+                </div>
                 <label className="sr-only">Your message</label>
                 <div className="flex items-center px-3 py-2 rounded-lg bg-gray-700">
                     
