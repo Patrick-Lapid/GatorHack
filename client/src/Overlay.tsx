@@ -153,12 +153,11 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             <div ref={ref}>
                 {expanded && <p className='text-white w-[90%] mx-auto my-8 leading-loose'>
                 {response}
-                Our Father, which art in heaven, Hallowed be thy Name. Thy Kingdom come. Thy will be done in earth, As it is in heaven. Give us this day our daily bread. And forgive us our trespasses, As we forgive them that trespass against us. And lead us not into temptation, But deliver us from evil. For thine is the kingdom, The power, and the glory, For ever and ever. Amen. Our Father, which art in heaven, Hallowed be thy Name. Thy Kingdom come. Thy will be done in earth, As it is in heaven. Give us this day our daily bread. And forgive us our trespasses, As we forgive them that trespass against us. And lead us not into temptation, But deliver us from evil. For thine is the kingdom, The power, and the glory, For ever and ever. Amen. Our Father, which art in heaven, Hallowed be thy Name. Thy Kingdom come. Thy will be done in earth, As it is in heaven. Give us this day our daily bread. And forgive us our trespasses, As we forgive them that trespass against us. And lead us not into temptation, But deliver us from evil. For thine is the kingdom, The power, and the glory, For ever and ever. Amen
                 </p>}
                 {expanded &&
-                    <m.div className='flex gap-4 pb-16 mx-auto w-[90%] text-white'>
+                    <m.div className='flex gap-4 pb-16 mx-auto w-[90%] text-white tracking-wide'>
                         <div onClick={() => scroll("Up")} className="cursor-pointer flex items-center p-2 text-base font-bold rounded-lg bg-gray-600 hover:bg-gray-500 group hover:shadowtext-white">
-                            <span className="whitespace-nowrap pr-3">Link 1 - scroll up</span>
+                            <span className="whitespace-nowrap px-2 mr-3">Link 1 - scroll up</span>
                             <ExternalLink
                                 size={15}
                                 strokeWidth={1.5}
@@ -166,7 +165,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
                             />
                         </div>
                         <div onClick={() => scroll("Down")} className="cursor-pointer flex items-center p-2 text-base font-bold rounded-lg bg-gray-600 hover:bg-gray-500 group hover:shadowtext-white">
-                            <span className="whitespace-nowrap pr-3">Link 2 - scroll down</span>
+                            <span className="whitespace-nowrap px-2">Link 2 - scroll down</span>
                             <ExternalLink
                                 size={15}
                                 strokeWidth={1.5}
@@ -179,7 +178,9 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             </div>
             
             {/* chatbot interface */}
-            <form style={{
+            <form 
+            onSubmit={(event) => {event.preventDefault(); setExpanded(!expanded); handleMessageSend()}}
+            style={{
                 position: 'fixed',
                 width: '100%',
                 bottom: 0,
@@ -187,22 +188,27 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             }}>
                 
                 <label className="sr-only">Your message</label>
-                <div className="flex items-center px-3 py-2 rounded-lg bg-gray-700">
+                <div className="flex items-center pl-5 py-2 rounded-lg bg-gray-700">
+                    {loading &&
+                        <div className="kinetic h-8 w-8 pt-3 pl-4"></div>
+                    }
+                    {!loading &&
+                        <AudioRecorder
+                            width="35px"
+                            height="35px"
+                            bgcolor="#138481"
+                            black={false}
+                            recorder={
+                            new MicRecorder({
+                                bitRate: 128,
+                            })
+                            }
+                            callback={callBack}
+                        />
+                    }
                     
-                    <AudioRecorder
-                        width="35px"
-                        height="35px"
-                        bgcolor="#138481"
-                        black={false}
-                        recorder={
-                        new MicRecorder({
-                            bitRate: 128,
-                        })
-                        }
-                        callback={callBack}
-                    />
-                    <input type='text' id="chat" ref={chatRef} className="w-[90%] tracking-wide block active:shadow-md mr-4 ml-4 p-2.5 text-md rounded-lg border bg-gray-800 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="Your message..." />
-                        <button onClick={(event) => {event.preventDefault(); setExpanded(!expanded); handleMessageSend() }} className="inline-flex border-none justify-center p-2 cursor-pointer text-blue-500 hover:bg-gray-600 rounded-lg">
+                    <input type='text' id="chat" ref={chatRef} className="w-[95%] ml-4 tracking-wide block active:shadow-md p-2.5 text-md rounded-lg border bg-gray-800 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="Your message..." />
+                        <button type='submit' className="inline-flex mx-4 border-none justify-center p-2 cursor-pointer text-blue-500 hover:bg-gray-600 rounded-lg">
                         <svg className="w-5 h-5 border-none rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                             <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z"/>
                         </svg>
