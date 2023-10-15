@@ -16,7 +16,6 @@ interface AudioRecorderProps {
 const AudioRecorder: React.FC<AudioRecorderProps> = ({
   width,
   height,
-  bgcolor,
   black,
   recorder,
   callback,
@@ -27,9 +26,7 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
     alignItems: 'center',
     width: width,
     height: height,
-    borderRadius: '50%',
     overflow: 'hidden',
-    backgroundColor: bgcolor,
   };
 
   const [isVisible, setIsVisible] = useState(true);
@@ -71,10 +68,10 @@ const AudioRecorder: React.FC<AudioRecorderProps> = ({
   };
 
   return (
-    <div style={style} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} className='cursor-pointer'>
+    <div style={style} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp} className='p-1.5 cursor-pointer hover:bg-gray-600 rounded-lg'>
       <img
         style={imageStyle}
-        src={black ? blackImage1Url : whiteImage1Url}
+        src={whiteImage1Url}
         alt="microphone"
       />
       <div style={squareStyle} />
