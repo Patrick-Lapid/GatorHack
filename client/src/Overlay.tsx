@@ -6,22 +6,36 @@ import { SquareMinus } from 'tabler-icons-react';
 import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
 
+const registry = new Map<string,(arg0: any) => void>();
+
 const ws = new WebSocket('ws://localhost:8765');
 
     // When the connection is open, send the text
     ws.onopen = () => {
-        ws.send("AAAAA");
+        //ws.send("AAAAA");
     };
 
     // Log any messages received from the server
     ws.onmessage = (message) => {
         console.log(`Received: ${message.data}`);
+        const data = JSON.parse(message.data)
+        
+        const lambda = registry.get(data.type)
+        //if lambda is not undefined, then execute it using data.data
+        if (lambda !== undefined) {
+            lambda(data.data)
+        }
     };
 
     // Log any errors
     ws.onerror = (error) => {
         console.log(`WebSocket error: ${error}`);
     };
+
+
+    const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
+        registry.set(s,callBack)
+    }
 
 const callBack = (buffer : ArrayBuffer, blob : Blob) => {
     
@@ -45,7 +59,12 @@ const Overlay = () => {
     const image1Url = chrome.runtime.getURL('images/mic_black.png');
     const [expanded, setExpanded] = useState(false);
     const [ref, { height }] = useMeasure();
+    const [response, setResponse] = useState("");
 
+    registerType("streamChars", (s: any) => {
+        const str = s as string
+        setResponse(response+str)}
+    )
 
     return (        
 
@@ -78,9 +97,7 @@ const Overlay = () => {
             {/* dynamic rendering of summary */}
             <div ref={ref}>
                 {expanded && <p className='py-20 text-white container mx-auto'>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod similique atque inventore sunt totam laborum enim dignissimos unde nisi numquam, odio, consectetur magnam, laudantium possimus ad? Labore molestias veritatis iste.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod similique atque inventore sunt totam laborum enim dignissimos unde nisi numquam, odio, consectetur magnam, laudantium possimus ad? Labore molestias veritatis iste.
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod similique atque inventore sunt totam laborum enim dignissimos unde nisi numquam, odio, consectetur magnam, laudantium possimus ad? Labore molestias veritatis iste.
+                {response}
                 </p>}
             </div>
             {/* chatbot interface */}
