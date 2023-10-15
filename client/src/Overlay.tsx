@@ -8,11 +8,14 @@ import MicRecorder from 'mic-recorder-to-mp3';
 
 const registry = new Map<string,(arg0: any) => void>();
 
+const id = Math.random()
+
 const ws = new WebSocket('ws://localhost:8765');
 
     // When the connection is open, send the text
     ws.onopen = () => {
         //ws.send("AAAAA");
+        ws.send(JSON.stringify({type: "register",id: id}))
     };
 
     // Log any messages received from the server
@@ -39,13 +42,17 @@ const ws = new WebSocket('ws://localhost:8765');
 
 const callBack = (buffer : ArrayBuffer, blob : Blob) => {
     
-    
-    ws.send(buffer)
+    const msg = {
+        id: id,
+        type: "audioMessage",
+        data: buffer
+    }
+    ws.send(JSON.stringify(msg))
     //no clue why this won't compile without "buffer as any"
-    const file = new File(buffer as any, 'me-at-thevoice.mp3', {
+    /*const file = new File(buffer as any, 'me-at-thevoice.mp3', {
       type: blob.type,
       lastModified: Date.now(),
-    });
+    });*/
   
     //const player = new Audio(URL.createObjectURL(file));
     //player.play();
@@ -63,7 +70,7 @@ const Overlay = () => {
 
     registerType("streamChars", (s: any) => {
         const str = s as string
-        setResponse(response+str)}
+        setResponse(str)}
     )
 
     return (        
