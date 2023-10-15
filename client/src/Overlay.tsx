@@ -12,33 +12,33 @@ const id = Math.random()
 
 const ws = new WebSocket('ws://localhost:8765');
 
-    // When the connection is open, send the text
-    ws.onopen = () => {
-        //ws.send("AAAAA");
-        ws.send(JSON.stringify({type: "register",id: id}))
-    };
+// When the connection is open, send the text
+ws.onopen = () => {
+    //ws.send("AAAAA");
+    ws.send(JSON.stringify({type: "register",id: id}))
+};
 
-    // Log any messages received from the server
-    ws.onmessage = (message) => {
-        console.log(`Received: ${message.data}`);
-        const data = JSON.parse(message.data)
+// Log any messages received from the server
+ws.onmessage = (message) => {
+    console.log(`Received: ${message.data}`);
+    const data = JSON.parse(message.data)
         
-        const lambda = registry.get(data.type)
-        //if lambda is not undefined, then execute it using data.data
-        if (lambda !== undefined) {
-            lambda(data.data)
-        }
-    };
-
-    // Log any errors
-    ws.onerror = (error) => {
-        console.log(`WebSocket error: ${error}`);
-    };
-
-
-    const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
-        registry.set(s,callBack)
+    const lambda = registry.get(data.type)
+    //if lambda is not undefined, then execute it using data.data
+    if (lambda !== undefined) {
+        lambda(data.data)
     }
+};
+
+// Log any errors
+ws.onerror = (error) => {
+    console.log(`WebSocket error: ${error}`);
+};
+
+
+const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
+    registry.set(s,callBack)
+}
 
 const callBack = (buffer : ArrayBuffer, blob : Blob) => {
     
@@ -60,7 +60,11 @@ const callBack = (buffer : ArrayBuffer, blob : Blob) => {
   };
 
 const Overlay = () => {
-
+    const chatRef = React.useRef<HTMLInputElement>(null);
+    const handleMessageSend = () => {
+        const message = chatRef.current?.value;
+        ws.send(JSON.stringify({type: "chatMessage",id: id,data: message}))
+    };
     console.log("y u no load")
 
     const image1Url = chrome.runtime.getURL('images/mic_black.png');
@@ -70,6 +74,7 @@ const Overlay = () => {
 
     registerType("streamChars", (s: any) => {
         const str = s as string
+        setExpanded(true)
         setResponse(str)}
     )
 
@@ -129,8 +134,8 @@ const Overlay = () => {
                         }
                         callback={callBack}
                     />
-                    <input type='text' id="chat" className="block active:shadow-md mx-4 p-2.5 w-full text-sm rounded-lg border bg-gray-800 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="Your message..." />
-                        <button onClick={(event) => {event.preventDefault(); setExpanded(!expanded);}} className="inline-flex border-none justify-center p-2 rounded-full cursor-pointer text-blue-500 hover:bg-gray-600">
+                    <input type='text' id="chat" ref={chatRef} className="block active:shadow-md mx-4 p-2.5 w-full text-sm rounded-lg border bg-gray-800 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="Your message..." />
+                        <button onClick={(event) => {event.preventDefault(); handleMessageSend() }} className="inline-flex border-none justify-center p-2 rounded-full cursor-pointer text-blue-500 hover:bg-gray-600">
                         <svg className="w-5 h-5 border-none rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                             <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z"/>
                         </svg>
