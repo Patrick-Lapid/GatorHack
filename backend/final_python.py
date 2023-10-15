@@ -4,8 +4,14 @@ import pandas as pd
 import numpy as np
 import pinecone
 import json
+import os
+from dotenv import load_dotenv
 
-openai.api_key = "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"
+load_dotenv()  
+
+openai.api_key = os.environ.get("API_KEY")
+
+
 summary_df = pd.read_csv("../scraping/updated_all_data.csv")
 
 actions = [

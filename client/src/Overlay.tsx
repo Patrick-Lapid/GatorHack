@@ -62,7 +62,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
     const [event, setEvent] = useState<summaryResponse | actionResponse | null>(null);
     const [links, setLinks] = useState<string[]>([]);
     const [ref, { height }] = useMeasure();
-    const [response, setResponse] = useState("");
+    const [response, setResponse] = useState<string>("");
 
     const ws = webSocket
 
@@ -111,7 +111,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
     )
 
     const onNavigate = (link : string) => {
-
+        window.location.href = link;
     }
 
     const resetPrompt = () => {
@@ -158,12 +158,12 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
 
             } else if (event?.act === "scroll") {
 
-                setResponse(`Scrolling ${event.act_list[0]}... `)
+                setResponse(`Scrolling ${event.act_list}... `)
                 scroll(event.act_list[0]);
 
             } else if (event?.act === "sort") {
 
-                setResponse(`Sorting by ${event.act_list[0]}`)
+                setResponse(`Sorting by ${event.act_list}`)
                 sortBy(event.act_list[0]);
             }
         }
@@ -232,7 +232,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
                 {expanded &&
                     <div className='flex gap-4 pb-16 mx-auto w-[90%] text-white tracking-wide'>
                         {links.map((link, index) => 
-                            <LinkCard label={link} key={index} navigateHandler={() => {}} link='#' />
+                            <LinkCard label={link} key={index} navigateHandler={onNavigate} link={link} />
                         )}
                     </div>
                 }
