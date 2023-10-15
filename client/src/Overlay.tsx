@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './contentscript.css';
-import AudioRecorder from './components/AudioRecorder';
-import MicRecorder from 'mic-recorder-to-mp3';
+import { motion as m } from 'framer-motion';
+import useMeasure from "react-use-measure";
+import { SquareMinus } from 'tabler-icons-react';
 
 const callBack = (buffer : ArrayBuffer, blob : Blob) => {
     // do what ever you want with buffer and blob
@@ -34,32 +35,56 @@ const callBack = (buffer : ArrayBuffer, blob : Blob) => {
 const Overlay = () => {
 
     const image1Url = chrome.runtime.getURL('images/mic_black.png');
+    const [expanded, setExpanded] = useState(false);
+    const [ref, { height }] = useMeasure();
 
-    return (
-        <>
-        <div className=''>
 
-        </div>
-        <div
+    return (        
+
+        <m.div
             className="rounded-t-md"
+            animate = {{ height: height + 37 }}
+            transition={{ delay : 0.25 }}
             style={{
                 fontFamily: 'googleFont',
                 overflow:'hidden',
                 position: 'fixed',
-                top: '93%',
+                bottom: 0,
                 left: 0,
                 width: '100%',
-                height: '7%',
                 backgroundColor: '#394150',
                 border: 'none',
-                // paddingBottom: "5px",
                 zIndex: 9999, // Adjust the z-index as needed
             }}
         >
-            <form>
-                <label  className="sr-only">Your message</label>
+            {/* close btn */}
+            <div className={`${expanded ? "block" : "hidden"} absolute top-5 right-5`}>
+                <button onClick={() => setExpanded(false)} type="button" className="inline-flex border-none justify-center p-2 rounded-lg cursor-pointer  text-gray-400 hover:text-white hover:bg-gray-600">
+                    <SquareMinus
+                        size={20}
+                        strokeWidth={1.5}
+                        color={'#9da3ae'}
+                    />
+                </button>
+            </div>
+            {/* dynamic rendering of summary */}
+            <div ref={ref}>
+                {expanded && <p className='py-20 text-white container mx-auto'>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod similique atque inventore sunt totam laborum enim dignissimos unde nisi numquam, odio, consectetur magnam, laudantium possimus ad? Labore molestias veritatis iste.
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod similique atque inventore sunt totam laborum enim dignissimos unde nisi numquam, odio, consectetur magnam, laudantium possimus ad? Labore molestias veritatis iste.
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod similique atque inventore sunt totam laborum enim dignissimos unde nisi numquam, odio, consectetur magnam, laudantium possimus ad? Labore molestias veritatis iste.
+                </p>}
+            </div>
+            {/* chatbot interface */}
+            <form style={{
+                position: 'fixed',
+                width: '100%',
+                bottom: 0,
+                left: 0,
+            }}>
+                <label className="sr-only">Your message</label>
                 <div className="flex items-center px-3 py-2 rounded-lg bg-gray-700">
-                    <button type="button" className="inline-flex border-none justify-center p-2 rounded-lg cursor-pointer  text-gray-400 hover:text-white hover:bg-gray-600">
+                    <button onClick={() => setExpanded(!expanded)} type="button" className="inline-flex border-none justify-center p-2 rounded-lg cursor-pointer  text-gray-400 hover:text-white hover:bg-gray-600">
                         <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 18">
                             <path fill="currentColor" d="M13 5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0ZM7.565 7.423 4.5 14h11.518l-2.516-3.71L11 13 7.565 7.423Z"/>
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 1H2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1Z"/>
@@ -76,8 +101,7 @@ const Overlay = () => {
                     </button>
                 </div>
             </form>
-        </div>
-        </>
+        </m.div>
         
     );
 };
