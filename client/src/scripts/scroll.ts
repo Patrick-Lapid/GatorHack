@@ -17,9 +17,9 @@ function scrollWindowByPixels(pixels : number) {
 
 export const scroll = (direction : string) => {
     if(direction === "Up"){
-        scrollWindowByPixels(600);
-    } else {
         scrollWindowByPixels(-600);
+    } else {
+        scrollWindowByPixels(600);
     }
     
 }

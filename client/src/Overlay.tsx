@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './contentscript.css';
 import { motion as m } from 'framer-motion';
 import useMeasure from "react-use-measure";
-import { ExternalLink, SquareMinus } from 'tabler-icons-react';
+import { Eraser, ExternalLink, SquareMinus } from 'tabler-icons-react';
 import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
 import { filterPhoneSection, filterTabletSection } from './scripts/filter';
@@ -114,6 +114,14 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
 
     }
 
+    const resetPrompt = () => {
+        setLinks([]);
+        setEvent(null);
+        setLoading(false);
+        setExpanded(false);
+        setResponse("");
+    }
+
     const isSummaryResponse = (object: any): object is summaryResponse => {
         if(object.summary){
             return true;
@@ -128,10 +136,11 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             return;
         }
 
+        setResponse("");
+
         // call the first one + update summary text and links
         if (isSummaryResponse(event)) {
             // `event` has type `summaryResponse`.
-
             setLinks(event.links);
 
         } else {
@@ -139,20 +148,22 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             // update screen + perform action
             if(event?.act === "filterPhone") {
                 
+                setResponse("Filtering phones...");
                 filterPhoneSection(event.act_list);
 
             } else if (event?.act === "filterTablet"){
 
-
+                setResponse("Filtering tablets by: ")
                 filterTabletSection(event.act_list);
 
             } else if (event?.act === "scroll") {
 
-
+                setResponse(`Scrolling ${event.act_list[0]}... `)
                 scroll(event.act_list[0]);
 
             } else if (event?.act === "sort") {
 
+                setResponse(`Sorting by ${event.act_list[0]}`)
                 sortBy(event.act_list[0]);
             }
         }
@@ -196,7 +207,14 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             }}
         >
             {/* close btn */}
-            <div className={`${expanded ? "block" : "hidden"} absolute`} style={{top: "13px", right: "13px"}} >
+            <div className={`${expanded ? "block" : "hidden"} absolute flex`} style={{top: "13px", right: "13px"}} >
+                <button onClick={() => resetPrompt()} type="button" className="inline-flex border-none justify-center p-2 rounded-lg cursor-pointer  text-gray-400 hover:text-white hover:bg-gray-600">
+                    <Eraser
+                        size={20}
+                        strokeWidth={1.5}
+                        color={'#9da3ae'}
+                    />
+                </button>
                 <button onClick={() => setExpanded(false)} type="button" className="inline-flex border-none justify-center p-2 rounded-lg cursor-pointer  text-gray-400 hover:text-white hover:bg-gray-600">
                     <SquareMinus
                         size={20}
@@ -205,6 +223,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
                     />
                 </button>
             </div>
+
             {/* dynamic rendering of summary */}
             <div ref={ref}>
                 {expanded && <p className='text-white w-[90%] mx-auto my-8 leading-loose'>
