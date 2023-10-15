@@ -5,12 +5,12 @@ import numpy as np
 import pinecone
 import json
 
-openai.api_key = "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"
-summmary_df = pd.read_csv("summary_embeddings.csv")
+openai.api_key = "ENTER API KEY HERE"
+summary_df = pd.read_csv("summary_embeddings.csv")
 
 actions = [
     [
-        "scroll", "GLOBAL", 
+        "0", "scroll", "GLOBAL", 
         {
             "name": "scroll",
             "description": "Scroll the screen",
@@ -28,7 +28,7 @@ actions = [
         }
     ],
     [
-        "search", "GLOBAL",
+        "1", "search", "GLOBAL",
         {
             "name": "search",
             "description": "Search for some product in Verizon",
@@ -46,7 +46,7 @@ actions = [
         }
     ],
     [
-        "get_filter", "LOCAL_PER_PHONE",
+        "2", "get_filter", "LOCAL_PER_PHONE",
         {
             "name": "get_filters",
             "description": "Parameters to filter phones",
@@ -107,7 +107,7 @@ actions = [
         }
     ],
     [
-        "get_sort_by", "LOCAL_PER_PHONE",
+        "3", "get_sort_by", "LOCAL_PER_PHONE",
         {
             "name": "get_sort_by",
             "description": "Parameters to sort the products",
@@ -124,11 +124,10 @@ actions = [
         }
     ],
     [
-        "get_filter", "LOCAL_TABLET",
-        ###FIXME### Put in the correct function call (change from business to regular)
+        "4", "get_filter", "LOCAL_TABLET",
         {
-            "name": "get_filters_tablet",
-            "description": "Get the parameters to filter tablets and laptops",
+            "name": "get_filter",
+            "description": "Get the parameters to filter the tablets",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -136,14 +135,21 @@ actions = [
                         "type": "array",
                         "items": {
                             "type": "string",
-                            "enum": ["Apple", "Orbic", "Samsung", "TCL"]
+                            "enum": ["Apple", "Samsung", "TCL", "Orbic", "Lenovo", "CTL", "RAZER"]
                         }
                     },
-                    "payment_type": {
+                    "os": {
                         "type": "array",
                         "items": {
                             "type": "string",
-                            "enum": ["2 Year Contact Pricing", "Device Payment"]
+                            "enum": ["Android", "Apple iOS", "Windows", "Chrome"]
+                        }
+                    },
+                    "special_offers": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["Bill Credit", "Trade In"]
                         }
                     },
                     "price": {
@@ -153,20 +159,41 @@ actions = [
                         },
                         "description": "size 2 array with the price lower bound (index 0) and upper bound (index 1)"
                     },
+                "series": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["Other Tablets", "iPad Pro", "Galaxy Tab", "Chromebook", "Laptops", "iPad Air", "iPad Generation", "iPad Mini"]
+                        }
+                    },
+                    "condition": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["New", "Certified Pre-Owned"]
+                        }
+                    },
+                    "availability": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": ["Exclude Out Of Stock"]
+                        }
+                    },
                     "color": {
                         "type": "array",
                         "items": {
                             "type": "string",
-                            "enum": ["Black", "White", "Blue", "Green", "Gray", "Purple", "Red", "Pink", "Silver", "Gold", "Yellow"]
+                            "enum": ["Black", "White", "Blue", "Gray", "Purple", "Pink", "Silver", "Gold", "Yellow"]
                         }
                     }
                 },
-                "required": ["brand", "payment_type", "price", "color"]
+                "required": ["brand", "os", "special_offers", "price", "series", "condition", "availability", "color"]
             }
         }
     ],
     [
-        "get_sort_by", "LOCAL_TABLET",
+        "5", "get_sort_by", "LOCAL_TABLET",
         {
             "name": "get_sort_by",
             "description": "Parameters to sort the products",
@@ -183,16 +210,19 @@ actions = [
         }
     ]
 ]
-###FIXME###
-action_df = pd.DataFrame(actions, columns=['function_name', 'local_state', 'openai_func_call'])
+###FIXME### Make sure it works
+action_df = pd.DataFrame(actions, columns=['id', 'function_name', 'local_state', 'openai_func_call'])
 ###FIXME### create df of: |search|local_state|url|
 page_nav = [
     [
-
+        "Personal Phone", "LOCAL_PER_PHONE", "https://www.verizon.com/smartphones/"
+    ],
+    [
+        "Tablets & Laptops", "LOCAL_TABLET", "https://www.verizon.com/tablets/"
     ]
-
-
-] 
+]
+###FIXME### Complete this and make sure it works
+page_nav_df = pd.DataFrame(page_nav, columns=["search", "local_state", "url"]) 
 
 def create_embedding(text):
     '''Create embeddings using ada-002'''
@@ -234,7 +264,7 @@ def summarize(query):
     )
     ids = [int(x['id']) for x in matches['matches']] #ids of top k matches
     #context from topk using page raw text
-    queried_dfs = summmary_df[summmary_df['id'].isin(ids)]
+    queried_dfs = summary_df[summary_df['id'].isin(ids)]
     context = ""
     for idx, r in queried_dfs.iterrows():
         context+=r['raw text']
@@ -245,7 +275,7 @@ def summarize(query):
 def intent_detection(query):
     '''Get intent from given query'''
 
-    query = f'''Given the user query "#QUERY#", identify the intent and provide a response in the format: {{intent: INTENT, action: ACTION}}. 
+    query = f'''Given the user query "#QUERY#", identify the intent and provide a response in the format: {{"intent": "INTENT", "action": "ACTION"}}. 
 The possible #INTENT# values are:
 - Information: Where the user is seeking an explanation, summary, or information.
 - Action: Where the user intends to perform an action, like filtering, sorting, navigating etc.
@@ -260,32 +290,95 @@ For instance, the query "Show me all iPhones in red color" would have a response
     intent = openai.Completion.create(model="gpt-3.5-turbo-instruct", prompt=query, temperature=0.1)
     return intent.choices[0].text[2:]
 
-def get_action(query, local_state):
-    query = f'''For the following user #QUERY#, use function calling to see if a function should be used or not. If no function is used, return NONE
+def get_function_call(query_embedding, h_state):
+    '''Return the Function Call ID based on embedding and state (Vector Search)'''
+
+    pinecone.init(api_key="67c9dbd6-4fe6-4693-bcc4-fd1a9ff6357e", environment="gcp-starter")
+    vecdb = pinecone.Index("action")
+    matches = vecdb.query(
+            top_k=1,
+            include_values=False,
+            vector=query_embedding,
+            filter={
+                "STATE": h_state
+            }
+        )
+    return matches['matches'][0]["id"]
+
+def get_action(query, query_intent_action, local_page):
+    '''Return the action to be performed. Return NONE if no action'''
+
+    query_updated = f'''For the following user #QUERY#, use function calling to see if a function should be used or not. If no function is used, return NONE
 
 ###QUERY###
 {query}'''
     
-    while True:
-        action_not_hit = True
-        #Local Action
-        if local_state in local_state_df:
+    #Local Action
+    if local_page in page_nav_df["url"].tolist():
+        query_embedding = create_embedding(query)
+        h_state = page_nav_df.loc[page_nav_df['url'] == local_page]['local_state'].values[0]
+        function_call_id = get_function_call(query_embedding, h_state)
 
+        response = openai.ChatCompletion.create(model="gpt-3.5-turbo",  temperature=0.1, functions=[action_df.loc[action_df['id'] == function_call_id]['openai_func_call'].values[0]], messages=[{"role": "user", "content": query_updated}])
+        if "function_call" not in response.choices[0].message:
+            return None
+        return response
+    #Global Action if 1. local action not hit 2. local action not available
+    else:
+        query_intent_action_embedding = create_embedding(query_intent_action)
+        function_call_id = get_function_call(query_intent_action_embedding, "GLOBAL")
+        response = openai.ChatCompletion.create(model="gpt-3.5-turbo", temperature=0.1, functions=[action_df.loc[action_df['id'] == function_call_id]['openai_func_call'].values[0]], messages=[{"role": "user", "content": query}])
+        if "function_call" not in response.choices[0].message:
+            return None
+        #Check which global action was hit and act accordingly
+        ###FIXME### Do something for scrolling
+        if response.choices[0].message.function_call.name == "scroll":
             pass
-        #Global Action if 1. local action not hit 2. local action not available
-        if action_not_hit:
-            pass
+        elif response.choices[0].message.function_call.name == "search":
+            search_arg = json.loads(response.choices[0].message.function_call.arguments)['product']
+            local_page = page_nav_df.loc[page_nav_df['search'] == search_arg]['url'].values[0]
+            return get_action(query, query_intent_action, local_page)
+        else:
+            return None
 
 
-def main_entry_function(query, local_state):
+def main_entry_function(query, local_page):
     '''Main usable function for singular query'''
     #Get intent
     query_intent = json.loads(intent_detection(query))
     #Conditional Statament
     if query_intent["intent"] == "Information":
         info = summarize(query)
+        return info
     elif query_intent["intent"] == "Action":
         query_intent_action = query_intent['action']
-        action = get_action(query, local_state)
+        action = get_action(query, query_intent_action, local_page)
+        return action
     else:
         pass
+
+'''
+VECTOR DB CREATION FUNCTIONS
+'''
+
+def create_summary_record(idx, ebd):
+    '''Insert a record into the summary vector db'''
+    pinecone.init(api_key="e7cb6b9a-88f4-46f9-a154-68a9f5feef72", environment="gcp-starter")
+    vecdb = pinecone.Index("summarization")
+    
+    vecdb.upsert([(str(idx), ebd)])
+
+def create_action_record(idx, h_state, ebd):
+    '''Insert a record into the action vector db'''
+    pinecone.init(api_key="67c9dbd6-4fe6-4693-bcc4-fd1a9ff6357e", environment="gcp-starter")
+    vecdb = pinecone.Index("action")
+
+    vecdb.upsert([(idx, ebd, {"STATE": h_state})])
+
+def create_summary_vectordb():
+    for idx, r in summary_df.iterrows():
+        create_summary_record(r['id'], create_embedding(r['raw text']))
+
+def create_action_vectordb():
+    for idx, r in action_df.iterrows(): 
+        create_action_record(r['id'], r['local_state'], create_embedding(r['openai_func_call']['description']))
