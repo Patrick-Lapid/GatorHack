@@ -3,7 +3,7 @@
     "name": "Overlay Extension",
     "version": "1.0",
     "description": "A simple overlay extension",
-    "permissions": ["activeTab"],
+    "permissions": ["activeTab","tabs"],
     "action": {
         "default_popup": "index.html"
     },
