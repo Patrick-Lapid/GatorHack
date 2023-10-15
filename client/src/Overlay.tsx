@@ -6,6 +6,7 @@ import { SquareMinus } from 'tabler-icons-react';
 import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
 import { filterPhoneSection, filterTabletSection } from './scripts/filter';
+import { sortBy } from './scripts/sort';
 
 const registry = new Map<string,(arg0: any) => void>();
 
@@ -128,10 +129,15 @@ const Overlay = () => {
             </div>
             {/* dynamic rendering of summary */}
             <div ref={ref}>
-                {expanded && <p className='py-20 text-white container mx-auto'>
+                {expanded && <p className=' text-white container mx-auto'>
                 {response}
                 </p>}
             </div>
+
+            <div>
+                some text
+            </div>
+
             {/* chatbot interface */}
             <form style={{
                 position: 'fixed',
