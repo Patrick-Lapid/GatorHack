@@ -241,7 +241,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             
             {/* chatbot interface */}
             <form 
-            onSubmit={(event) => {event.preventDefault(); setExpanded(!expanded); handleMessageSend(); setLoading(true)}}
+            onSubmit={(event) => {event.preventDefault(); setExpanded(expanded); handleMessageSend(); setLoading(true)}}
             style={{
                 position: 'fixed',
                 width: '100%',
