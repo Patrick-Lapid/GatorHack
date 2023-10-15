@@ -372,8 +372,6 @@ def main_entry_function(query, local_page):
         query_intent_action = query_intent['action']
         action = get_action(query, query_intent_action, local_page)
         if action[0] != local_page:
-            #type = navigation
-            #Provide some kinda message like 
             result_json = {
                 "type": "navigation",
                 "message": "I think this link will help. Would you like to navigate there?",
@@ -386,7 +384,6 @@ def main_entry_function(query, local_page):
             json_string = json.dumps(result_json)
             return json_string
         else:
-            #type = action
             result_json = {
                 "type": "actionResponse",
                 "action": {
