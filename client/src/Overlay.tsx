@@ -5,61 +5,69 @@ import useMeasure from "react-use-measure";
 import { SquareMinus } from 'tabler-icons-react';
 import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
+import { type } from 'os';
 
 const registry = new Map<string,(arg0: any) => void>();
 
+//deprecated, but kept to be flexible
 const id = Math.random()
 
-const ws = new WebSocket('ws://localhost:8765');
 
-// When the connection is open, send the text
-ws.onopen = () => {
-    //ws.send("AAAAA");
-    ws.send(JSON.stringify({type: "register",id: id}))
-};
-
-// Log any messages received from the server
-ws.onmessage = (message) => {
-    console.log(`Received: ${message.data}`);
-    const data = JSON.parse(message.data)
-        
-    const lambda = registry.get(data.type)
-    //if lambda is not undefined, then execute it using data.data
-    if (lambda !== undefined) {
-        lambda(data.data)
-    }
-};
-
-// Log any errors
-ws.onerror = (error) => {
-    console.log(`WebSocket error: ${error}`);
-};
-
-
-const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
-    registry.set(s,callBack)
+interface AudioRecorderProps {
+    webSocket: WebSocket;
 }
 
-const callBack = (buffer : ArrayBuffer, blob : Blob) => {
-    
-    const msg = {
-        id: id,
-        type: "audioMessage",
-        data: buffer
-    }
-    ws.send(JSON.stringify(msg))
-    //no clue why this won't compile without "buffer as any"
-    /*const file = new File(buffer as any, 'me-at-thevoice.mp3', {
-      type: blob.type,
-      lastModified: Date.now(),
-    });*/
-  
-    //const player = new Audio(URL.createObjectURL(file));
-    //player.play();
-    
-  };
+const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
 
-const Overlay = () => {
+    const ws = webSocket
+    // When the connection is open, send the text
+    ws.onopen = () => {
+        //ws.send("AAAAA");
+        //ws.send(JSON.stringify({type: "register",id: id}))
+    };
+
+    // Log any messages received from the server
+    ws.onmessage = (message) => {
+        console.log(`Received: ${message.data}`);
+        const data = JSON.parse(message.data)
+            
+        const lambda = registry.get(data.type)
+        //if lambda is not undefined, then execute it using data.data
+        if (lambda !== undefined) {
+            lambda(data.data)
+        }
+    };
+
+    // Log any errors
+    ws.onerror = (error) => {
+        console.log(`WebSocket error: ${error}`);
+    };
+
+
+    const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
+        registry.set(s,callBack)
+    }
+
+    const callBack = (buffer : ArrayBuffer, blob : Blob) => {
+        
+        const msg = {
+            id: id,
+            type: "audioMessage",
+            data: buffer
+        }
+        ws.send(JSON.stringify(msg))
+        //no clue why this won't compile without "buffer as any"
+        /*const file = new File(buffer as any, 'me-at-thevoice.mp3', {
+        type: blob.type,
+        lastModified: Date.now(),
+        });*/
+    
+        //const player = new Audio(URL.createObjectURL(file));
+        //player.play();
+        
+    };
+
+
     const chatRef = React.useRef<HTMLInputElement>(null);
     const handleMessageSend = () => {
         const message = chatRef.current?.value;
@@ -72,11 +80,29 @@ const Overlay = () => {
     const [ref, { height }] = useMeasure();
     const [response, setResponse] = useState("");
 
+
     registerType("streamChars", (s: any) => {
         const str = s as string
         setExpanded(true)
         setResponse(str)}
     )
+
+    type ActionButtonData = {
+        display: {
+            type: string; 
+            data: any;
+        };
+        action: {
+            type: string;
+            data: any;
+        }
+    };
+
+    //3 actions in the array
+    registerType("recieveActions", (actions : ActionButtonData[] ) => {
+        console.log(actions)
+        
+    })
 
     return (        
 
@@ -111,6 +137,7 @@ const Overlay = () => {
                 {expanded && <p className='py-20 text-white container mx-auto'>
                 {response}
                 </p>}
+                
             </div>
             {/* chatbot interface */}
             <form style={{
