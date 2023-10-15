@@ -1,25 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './contentscript.css';
 import { motion as m } from 'framer-motion';
 import useMeasure from "react-use-measure";
-import { SquareMinus } from 'tabler-icons-react';
+import { ExternalLink, SquareMinus } from 'tabler-icons-react';
 import AudioRecorder from './components/AudioRecorder';
 import MicRecorder from 'mic-recorder-to-mp3';
-import { type } from 'os';
 import { filterPhoneSection, filterTabletSection } from './scripts/filter';
-import { sortBy } from './scripts/sort';
+import { scroll } from './scripts/scroll';
 
 const registry = new Map<string,(arg0: any) => void>();
 
 //deprecated, but kept to be flexible
 const id = Math.random()
 
+type ActionButtonData = {
+    display: {
+        type: string; 
+        data: any;
+    };
+    action: {
+        type: string;
+        data: any;
+    }
+};
 
 interface AudioRecorderProps {
     webSocket: WebSocket;
 }
 
 const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
+
+    const chatRef = React.useRef<HTMLInputElement>(null);
+    const handleMessageSend = () => {
+        const message = chatRef.current?.value;
+        ws.send(JSON.stringify({type: "chatMessage",id: id,data: message}))
+    };
+
+    const [expanded, setExpanded] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [actionBus, setActionBus] = useState<ActionButtonData[]>([]);
+    const [summaryText, setSummaryText] = useState<string>("");
+    const [links, setLinks] = useState<string[]>([]);
+    const [ref, { height }] = useMeasure();
+    const [response, setResponse] = useState("");
 
     const ws = webSocket
 
@@ -46,7 +69,6 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
         console.log(`WebSocket error: ${error}`);
     };
 
-
     const registerType = (s : string, callBack : ((arg0: any) => void) ) => {
         registry.set(s,callBack)
     }
@@ -61,58 +83,32 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
         ws.send(JSON.stringify(msg))
     };
 
-
-    const characterAnimation = {
-        hidden: {
-        opacity: 0,
-        y: `0.25em`,
-        },
-        visible: {
-        opacity: 1,
-        y: `0em`,
-        transition: {
-            duration: 1,
-            ease: [0.2, 0.65, 0.3, 0.9],
-        },
-        },
-    };
-
-
-
-    const chatRef = React.useRef<HTMLInputElement>(null);
-    const handleMessageSend = () => {
-        const message = chatRef.current?.value;
-        ws.send(JSON.stringify({type: "chatMessage",id: id,data: message}))
-    };
-    console.log("y u no load")
-
-    const image1Url = chrome.runtime.getURL('images/mic_black.png');
-    const [expanded, setExpanded] = useState(false);
-    const [ref, { height }] = useMeasure();
-    const [response, setResponse] = useState("");
-
-
     registerType("streamChars", (s: any) => {
         const str = s as string
         setExpanded(true)
         setResponse(str)}
     )
 
-    type ActionButtonData = {
-        display: {
-            type: string; 
-            data: any;
-        };
-        action: {
-            type: string;
-            data: any;
+
+    useEffect(() => {
+        // call the first one + update summary text and links
+        actionBus.forEach(action => {
+
+        });
+
+        if(actionBus.length > 0){
+            setLoading(false);
         }
-    };
+
+    }, [actionBus])
+
 
     //3 actions in the array
     registerType("recieveActions", (actions : ActionButtonData[] ) => {
-        console.log(actions)
+        setActionBus(actions);
+        console.log(actions);
     })
+
     registerType("filterPhone", async (arr: any) => {
         const filterParams = ["Google", "Nokia", "$30-$40"]
         filterPhoneSection(filterParams);
@@ -142,7 +138,7 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             }}
         >
             {/* close btn */}
-            <div className={`${expanded ? "block" : "hidden"} absolute top-5 right-5`}>
+            <div className={`${expanded ? "block" : "hidden"} absolute`} style={{top: "13px", right: "13px"}} >
                 <button onClick={() => setExpanded(false)} type="button" className="inline-flex border-none justify-center p-2 rounded-lg cursor-pointer  text-gray-400 hover:text-white hover:bg-gray-600">
                     <SquareMinus
                         size={20}
@@ -153,9 +149,30 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
             </div>
             {/* dynamic rendering of summary */}
             <div ref={ref}>
-                {expanded && <p className=' text-white container mx-auto'>
+                {expanded && <p className='text-white w-[90%] mx-auto my-8 leading-loose'>
                 {response}
+                Our Father, which art in heaven, Hallowed be thy Name. Thy Kingdom come. Thy will be done in earth, As it is in heaven. Give us this day our daily bread. And forgive us our trespasses, As we forgive them that trespass against us. And lead us not into temptation, But deliver us from evil. For thine is the kingdom, The power, and the glory, For ever and ever. Amen. Our Father, which art in heaven, Hallowed be thy Name. Thy Kingdom come. Thy will be done in earth, As it is in heaven. Give us this day our daily bread. And forgive us our trespasses, As we forgive them that trespass against us. And lead us not into temptation, But deliver us from evil. For thine is the kingdom, The power, and the glory, For ever and ever. Amen. Our Father, which art in heaven, Hallowed be thy Name. Thy Kingdom come. Thy will be done in earth, As it is in heaven. Give us this day our daily bread. And forgive us our trespasses, As we forgive them that trespass against us. And lead us not into temptation, But deliver us from evil. For thine is the kingdom, The power, and the glory, For ever and ever. Amen
                 </p>}
+                {expanded &&
+                    <m.div className='flex gap-4 pb-16 mx-auto w-[90%] text-white'>
+                        <div onClick={() => scroll("Up")} className="cursor-pointer flex items-center p-2 text-base font-bold rounded-lg bg-gray-600 hover:bg-gray-500 group hover:shadowtext-white">
+                            <span className="whitespace-nowrap pr-3">Link 1 - scroll up</span>
+                            <ExternalLink
+                                size={15}
+                                strokeWidth={1.5}
+                                color={'white'}
+                            />
+                        </div>
+                        <div onClick={() => scroll("Down")} className="cursor-pointer flex items-center p-2 text-base font-bold rounded-lg bg-gray-600 hover:bg-gray-500 group hover:shadowtext-white">
+                            <span className="whitespace-nowrap pr-3">Link 2 - scroll down</span>
+                            <ExternalLink
+                                size={15}
+                                strokeWidth={1.5}
+                                color={'white'}
+                            />
+                        </div>
+                    </m.div>
+                }
                 
             </div>
             
@@ -166,21 +183,13 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
                 bottom: 0,
                 left: 0,
             }}>
-                <div className="container" style={expanded ? {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                } : {display:'none'}}>
-                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 1</div>
-                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 2</div>
-                    <div className="box" style={{ margin: '2px 10px', padding: '5px 20px' }}>Box 3</div>
-                </div>
+                
                 <label className="sr-only">Your message</label>
                 <div className="flex items-center px-3 py-2 rounded-lg bg-gray-700">
                     
                     <AudioRecorder
-                        width="30px"
-                        height="30px"
+                        width="35px"
+                        height="35px"
                         bgcolor="#138481"
                         black={false}
                         recorder={
@@ -190,8 +199,8 @@ const Overlay: React.FC<AudioRecorderProps> = ({webSocket}) => {
                         }
                         callback={callBack}
                     />
-                    <input type='text' id="chat" ref={chatRef} className="block active:shadow-md mx-4 p-2.5 w-full text-sm rounded-lg border bg-gray-800 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="Your message..." />
-                        <button onClick={(event) => {event.preventDefault(); setExpanded(true); handleMessageSend() }} className="inline-flex border-none justify-center p-2 rounded-full cursor-pointer text-blue-500 hover:bg-gray-600">
+                    <input type='text' id="chat" ref={chatRef} className="w-[90%] tracking-wide block active:shadow-md mr-4 ml-4 p-2.5 text-md rounded-lg border bg-gray-800 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500" placeholder="Your message..." />
+                        <button onClick={(event) => {event.preventDefault(); setExpanded(!expanded); handleMessageSend() }} className="inline-flex border-none justify-center p-2 cursor-pointer text-blue-500 hover:bg-gray-600 rounded-lg">
                         <svg className="w-5 h-5 border-none rotate-90" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 20">
                             <path d="m17.914 18.594-8-18a1 1 0 0 0-1.828 0l-8 18a1 1 0 0 0 1.157 1.376L8 18.281V9a1 1 0 0 1 2 0v9.281l6.758 1.689a1 1 0 0 0 1.156-1.376Z"/>
                         </svg>
