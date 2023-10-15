@@ -353,7 +353,12 @@ def main_entry_function(query, local_page):
     #Conditional Statament
     if query_intent["intent"] == "Information":
         info = summarize(query)
-        return info
+        result_json =  {
+            "type": "summaryResponse",
+            "message": info[0],
+            "link": info[1]
+        }
+        return result_json
     elif query_intent["intent"] == "Action":
         query_intent_action = query_intent['action']
         action = get_action(query, query_intent_action, local_page)
